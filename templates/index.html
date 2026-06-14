@@ -5,200 +5,298 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Text Humanizer</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700&display=swap');
+
+    :root {
+      --accent: #00e5cc;
+      --accent-dim: #00b8a3;
+      --accent-glow: rgba(0, 229, 204, 0.15);
+      --accent-glow-strong: rgba(0, 229, 204, 0.3);
+      --bg: #050a0e;
+      --bg-card: #080f14;
+      --bg-input: #040810;
+      --border: #0d2b35;
+      --border-accent: #00e5cc44;
+      --text: #c8e6e3;
+      --text-dim: #4a7a76;
+      --text-muted: #1e4a46;
+      --red: #ff4466;
+      --green: #00e5cc;
+    }
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #0f1117;
-      color: #e2e8f0;
+      font-family: 'Exo 2', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 40px 16px;
+      background-image:
+        linear-gradient(rgba(0,229,204,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,204,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
     }
 
+    /* ── Header ── */
     header {
       text-align: center;
-      margin-bottom: 36px;
+      margin-bottom: 40px;
     }
 
-    header h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      color: #f8fafc;
-      letter-spacing: -0.5px;
-    }
-
-    header p {
-      margin-top: 8px;
-      color: #94a3b8;
-      font-size: 0.95rem;
-    }
-
-    .card {
-      background: #1e2130;
-      border: 1px solid #2d3148;
-      border-radius: 12px;
-      padding: 28px;
-      width: 100%;
-      max-width: 780px;
-      margin-bottom: 24px;
-    }
-
-    .card h2 {
-      font-size: 0.8rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #64748b;
-      margin-bottom: 14px;
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 160px;
-      background: #0f1117;
-      border: 1px solid #2d3148;
-      border-radius: 8px;
-      color: #e2e8f0;
-      font-size: 0.95rem;
-      line-height: 1.6;
-      padding: 14px;
-      resize: vertical;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    textarea:focus { border-color: #6366f1; }
-    textarea::placeholder { color: #475569; }
-
-    .controls {
+    header .logo-line {
       display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
-
-    .control-group {
-      flex: 1;
-      min-width: 180px;
-    }
-
-    .control-group label {
-      display: block;
-      font-size: 0.8rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #64748b;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
       margin-bottom: 10px;
     }
 
-    .pill-group {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+    header .bracket {
+      color: var(--accent);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.6rem;
+      opacity: 0.6;
     }
 
-    .pill {
-      padding: 6px 16px;
-      border-radius: 999px;
-      border: 1px solid #2d3148;
-      background: #0f1117;
-      color: #94a3b8;
+    header h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    header h1 span { color: var(--accent); }
+
+    header p {
+      color: var(--text-dim);
       font-size: 0.85rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 28px;
+      width: 100%;
+      max-width: 820px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    /* corner accents */
+    .card::before, .card::after {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-color: var(--accent);
+      border-style: solid;
+    }
+    .card::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+    .card::after  { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+    .card-title {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 2px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--border-accent), transparent);
+    }
+
+    /* ── Controls ── */
+    .controls {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .control-group { flex: 1; min-width: 200px; }
+
+    .control-group label {
+      display: block;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .pill-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .pill {
+      padding: 5px 16px;
+      border-radius: 2px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 0.82rem;
+      font-family: 'Share Tech Mono', monospace;
       cursor: pointer;
       transition: all 0.15s;
       user-select: none;
+      letter-spacing: 1px;
     }
 
-    .pill:hover { border-color: #6366f1; color: #e2e8f0; }
+    .pill:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
 
     .pill.active {
-      background: #6366f1;
-      border-color: #6366f1;
-      color: #fff;
-      font-weight: 600;
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-glow);
+      box-shadow: 0 0 12px var(--accent-glow-strong);
     }
 
+    /* ── Textarea ── */
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      color: var(--text);
+      font-size: 0.92rem;
+      font-family: 'Exo 2', sans-serif;
+      line-height: 1.7;
+      padding: 14px;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    textarea:focus {
+      border-color: var(--accent-dim);
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    textarea::placeholder { color: var(--text-muted); }
+
+    /* ── Button ── */
     .btn-humanize {
       width: 100%;
-      padding: 14px;
-      background: #6366f1;
-      color: #fff;
-      font-size: 1rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 8px;
+      padding: 13px;
+      background: transparent;
+      color: var(--accent);
+      font-size: 0.9rem;
+      font-weight: 700;
+      font-family: 'Share Tech Mono', monospace;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      border: 1px solid var(--accent);
+      border-radius: 2px;
       cursor: pointer;
-      transition: background 0.2s, opacity 0.2s;
-      letter-spacing: 0.3px;
+      transition: all 0.2s;
+      margin-top: 18px;
+      position: relative;
+      overflow: hidden;
     }
 
-    .btn-humanize:hover { background: #4f46e5; }
-    .btn-humanize:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-humanize:hover {
+      background: var(--accent-glow);
+      box-shadow: 0 0 24px var(--accent-glow-strong), inset 0 0 24px var(--accent-glow);
+    }
 
+    .btn-humanize:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* ── Output ── */
     .output-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
 
-    .output-header h2 { margin-bottom: 0; }
+    .output-header .card-title { margin-bottom: 0; flex: 1; }
 
     .btn-copy {
-      padding: 6px 14px;
+      padding: 5px 14px;
       background: transparent;
-      border: 1px solid #2d3148;
-      border-radius: 6px;
-      color: #94a3b8;
-      font-size: 0.8rem;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      color: var(--text-dim);
+      font-size: 0.72rem;
+      font-family: 'Share Tech Mono', monospace;
+      letter-spacing: 1px;
       cursor: pointer;
       transition: all 0.15s;
     }
 
-    .btn-copy:hover { border-color: #6366f1; color: #e2e8f0; }
-    .btn-copy.copied { border-color: #22c55e; color: #22c55e; }
+    .btn-copy:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-copy.copied { border-color: var(--green); color: var(--green); }
 
     #output-box {
       width: 100%;
-      min-height: 160px;
-      background: #0f1117;
-      border: 1px solid #2d3148;
-      border-radius: 8px;
-      color: #e2e8f0;
-      font-size: 0.95rem;
-      line-height: 1.6;
+      min-height: 150px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      color: var(--text);
+      font-size: 0.92rem;
+      font-family: 'Exo 2', sans-serif;
+      line-height: 1.7;
       padding: 14px;
       white-space: pre-wrap;
       word-break: break-word;
     }
 
-    #output-box.placeholder { color: #475569; font-style: italic; }
-
-    .badge-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 12px;
+    #output-box.placeholder {
+      color: var(--text-muted);
+      font-style: italic;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.82rem;
     }
+
+    /* ── Badges ── */
+    .badge-row { display: flex; gap: 8px; margin-top: 12px; }
 
     .badge {
-      font-size: 0.75rem;
+      font-size: 0.68rem;
+      font-family: 'Share Tech Mono', monospace;
       padding: 3px 10px;
-      border-radius: 999px;
-      background: #2d3148;
-      color: #94a3b8;
+      border-radius: 2px;
+      border: 1px solid var(--border-accent);
+      color: var(--accent-dim);
+      background: var(--accent-glow);
       display: none;
+      letter-spacing: 1px;
     }
 
+    /* ── Spinner ── */
     .spinner {
       display: none;
-      width: 18px;
-      height: 18px;
-      border: 2px solid #ffffff44;
-      border-top-color: #fff;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--accent-glow);
+      border-top-color: var(--accent);
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
       margin: 0 auto;
@@ -206,31 +304,42 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ── Error ── */
     .error-msg {
-      color: #f87171;
-      font-size: 0.85rem;
+      color: var(--red);
+      font-size: 0.8rem;
+      font-family: 'Share Tech Mono', monospace;
       margin-top: 10px;
       display: none;
+      letter-spacing: 0.5px;
     }
 
+    /* ── Footer ── */
     footer {
-      margin-top: 16px;
-      color: #334155;
-      font-size: 0.8rem;
+      margin-top: 20px;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-family: 'Share Tech Mono', monospace;
+      letter-spacing: 2px;
       text-align: center;
+      text-transform: uppercase;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>AI Text Humanizer</h1>
-    <p>Rewrite AI-generated text to sound natural — fully offline, powered by Ollama</p>
+    <div class="logo-line">
+      <span class="bracket">[</span>
+      <h1>AI Text <span>Humanizer</span></h1>
+      <span class="bracket">]</span>
+    </div>
+    <p>Offline · Powered by Ollama · No data leaves your device</p>
   </header>
 
-  <!-- Input card -->
+  <!-- Settings + Input card -->
   <div class="card">
-    <h2>Settings</h2>
+    <div class="card-title">// Configuration</div>
     <div class="controls">
       <div class="control-group">
         <label>Tone</label>
@@ -238,7 +347,7 @@
           {% for tone in tones %}
           <div class="pill {% if tone == default_tone %}active{% endif %}"
                data-group="tone" data-value="{{ tone }}">
-            {{ tone.capitalize() }}
+            {{ tone.upper() }}
           </div>
           {% endfor %}
         </div>
@@ -249,20 +358,20 @@
           {% for intensity in intensities %}
           <div class="pill {% if intensity == default_intensity %}active{% endif %}"
                data-group="intensity" data-value="{{ intensity }}">
-            {{ intensity.capitalize() }}
+            {{ intensity.upper() }}
           </div>
           {% endfor %}
         </div>
       </div>
     </div>
 
-    <h2 style="margin-bottom: 10px;">Input Text</h2>
-    <textarea id="input-text" placeholder="Paste your AI-generated text here..."></textarea>
+    <div class="card-title">// Input</div>
+    <textarea id="input-text" placeholder="> paste AI-generated text here..."></textarea>
 
     <div class="error-msg" id="error-msg"></div>
 
-    <button class="btn-humanize" id="btn-humanize" style="margin-top: 16px;" onclick="runHumanize()">
-      <span id="btn-label">Humanize</span>
+    <button class="btn-humanize" id="btn-humanize" onclick="runHumanize()">
+      <span id="btn-label">[ Humanize ]</span>
       <div class="spinner" id="spinner"></div>
     </button>
   </div>
@@ -270,20 +379,19 @@
   <!-- Output card -->
   <div class="card">
     <div class="output-header">
-      <h2>Output</h2>
-      <button class="btn-copy" id="btn-copy" onclick="copyOutput()">Copy</button>
+      <div class="card-title">// Output</div>
+      <button class="btn-copy" id="btn-copy" onclick="copyOutput()">[ COPY ]</button>
     </div>
-    <div id="output-box" class="placeholder">Your humanized text will appear here...</div>
+    <div id="output-box" class="placeholder">> awaiting input...</div>
     <div class="badge-row">
       <span class="badge" id="badge-tone"></span>
       <span class="badge" id="badge-intensity"></span>
     </div>
   </div>
 
-  <footer>Running locally · No data leaves your device</footer>
+  <footer>System: Local &nbsp;|&nbsp; Model: Ollama &nbsp;|&nbsp; Status: Online</footer>
 
   <script>
-    // Pill selection
     document.querySelectorAll(".pill").forEach(pill => {
       pill.addEventListener("click", () => {
         const group = pill.dataset.group;
@@ -298,7 +406,7 @@
 
     function showError(msg) {
       const el = document.getElementById("error-msg");
-      el.textContent = msg;
+      el.textContent = "> ERROR: " + msg;
       el.style.display = "block";
     }
 
@@ -320,7 +428,7 @@
       const tone = getSelected("tone");
       const intensity = getSelected("intensity");
 
-      if (!text) { showError("Please paste some text before humanizing."); return; }
+      if (!text) { showError("No input text provided."); return; }
 
       setLoading(true);
 
@@ -342,7 +450,6 @@
         outputBox.textContent = data.result;
         outputBox.classList.remove("placeholder");
 
-        // Show badges
         const badgeTone = document.getElementById("badge-tone");
         const badgeIntensity = document.getElementById("badge-intensity");
         badgeTone.textContent = `tone: ${data.tone}`;
@@ -358,15 +465,14 @@
     }
 
     function copyOutput() {
-      const text = document.getElementById("output-box").textContent;
-      if (!text || document.getElementById("output-box").classList.contains("placeholder")) return;
-
-      navigator.clipboard.writeText(text).then(() => {
+      const box = document.getElementById("output-box");
+      if (box.classList.contains("placeholder")) return;
+      navigator.clipboard.writeText(box.textContent).then(() => {
         const btn = document.getElementById("btn-copy");
-        btn.textContent = "Copied!";
+        btn.textContent = "[ COPIED! ]";
         btn.classList.add("copied");
         setTimeout(() => {
-          btn.textContent = "Copy";
+          btn.textContent = "[ COPY ]";
           btn.classList.remove("copied");
         }, 2000);
       });
