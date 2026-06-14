@@ -1,11 +1,12 @@
 """
-app.py - Flask web interface for ai-text-humanizer (Phase 3)
+app.py - Flask web interface for ai-text-humanizer (Phase 4)
 
 Usage:
     python app.py
     Then open http://localhost:5000 in your browser.
 """
 
+import time
 from flask import Flask, render_template, request, jsonify
 from humanizer.core import humanize, check_ollama_connection, DEFAULT_MODEL, TONES, INTENSITIES
 
@@ -40,7 +41,8 @@ def humanize_text():
         {
             "result": "...",
             "tone": "...",
-            "intensity": "..."
+            "intensity": "...",
+            "elapsed": 4.2
         }
     """
     data = request.get_json()
@@ -59,8 +61,10 @@ def humanize_text():
         return jsonify({"error": f"Invalid intensity. Choose from: {', '.join(INTENSITIES)}"}), 400
 
     try:
+        start = time.time()
         result = humanize(text, model=DEFAULT_MODEL, tone=tone, intensity=intensity)
-        return jsonify({"result": result, "tone": tone, "intensity": intensity})
+        elapsed = round(time.time() - start, 1)
+        return jsonify({"result": result, "tone": tone, "intensity": intensity, "elapsed": elapsed})
     except ConnectionError as e:
         return jsonify({"error": str(e)}), 503
     except RuntimeError as e:
