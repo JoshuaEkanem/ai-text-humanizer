@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Text Humanizer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 16px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #f8fafc;
+      letter-spacing: -0.5px;
+    }
+
+    header p {
+      margin-top: 8px;
+      color: #94a3b8;
+      font-size: 0.95rem;
+    }
+
+    .card {
+      background: #1e2130;
+      border: 1px solid #2d3148;
+      border-radius: 12px;
+      padding: 28px;
+      width: 100%;
+      max-width: 780px;
+      margin-bottom: 24px;
+    }
+
+    .card h2 {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #64748b;
+      margin-bottom: 14px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 160px;
+      background: #0f1117;
+      border: 1px solid #2d3148;
+      border-radius: 8px;
+      color: #e2e8f0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      padding: 14px;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    textarea:focus { border-color: #6366f1; }
+    textarea::placeholder { color: #475569; }
+
+    .controls {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .control-group {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .control-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #64748b;
+      margin-bottom: 10px;
+    }
+
+    .pill-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      padding: 6px 16px;
+      border-radius: 999px;
+      border: 1px solid #2d3148;
+      background: #0f1117;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+    }
+
+    .pill:hover { border-color: #6366f1; color: #e2e8f0; }
+
+    .pill.active {
+      background: #6366f1;
+      border-color: #6366f1;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .btn-humanize {
+      width: 100%;
+      padding: 14px;
+      background: #6366f1;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, opacity 0.2s;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-humanize:hover { background: #4f46e5; }
+    .btn-humanize:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .output-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .output-header h2 { margin-bottom: 0; }
+
+    .btn-copy {
+      padding: 6px 14px;
+      background: transparent;
+      border: 1px solid #2d3148;
+      border-radius: 6px;
+      color: #94a3b8;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-copy:hover { border-color: #6366f1; color: #e2e8f0; }
+    .btn-copy.copied { border-color: #22c55e; color: #22c55e; }
+
+    #output-box {
+      width: 100%;
+      min-height: 160px;
+      background: #0f1117;
+      border: 1px solid #2d3148;
+      border-radius: 8px;
+      color: #e2e8f0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      padding: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    #output-box.placeholder { color: #475569; font-style: italic; }
+
+    .badge-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: #2d3148;
+      color: #94a3b8;
+      display: none;
+    }
+
+    .spinner {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #ffffff44;
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-msg {
+      color: #f87171;
+      font-size: 0.85rem;
+      margin-top: 10px;
+      display: none;
+    }
+
+    footer {
+      margin-top: 16px;
+      color: #334155;
+      font-size: 0.8rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>AI Text Humanizer</h1>
+    <p>Rewrite AI-generated text to sound natural — fully offline, powered by Ollama</p>
+  </header>
+
+  <!-- Input card -->
+  <div class="card">
+    <h2>Settings</h2>
+    <div class="controls">
+      <div class="control-group">
+        <label>Tone</label>
+        <div class="pill-group" id="tone-group">
+          {% for tone in tones %}
+          <div class="pill {% if tone == default_tone %}active{% endif %}"
+               data-group="tone" data-value="{{ tone }}">
+            {{ tone.capitalize() }}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="control-group">
+        <label>Intensity</label>
+        <div class="pill-group" id="intensity-group">
+          {% for intensity in intensities %}
+          <div class="pill {% if intensity == default_intensity %}active{% endif %}"
+               data-group="intensity" data-value="{{ intensity }}">
+            {{ intensity.capitalize() }}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <h2 style="margin-bottom: 10px;">Input Text</h2>
+    <textarea id="input-text" placeholder="Paste your AI-generated text here..."></textarea>
+
+    <div class="error-msg" id="error-msg"></div>
+
+    <button class="btn-humanize" id="btn-humanize" style="margin-top: 16px;" onclick="runHumanize()">
+      <span id="btn-label">Humanize</span>
+      <div class="spinner" id="spinner"></div>
+    </button>
+  </div>
+
+  <!-- Output card -->
+  <div class="card">
+    <div class="output-header">
+      <h2>Output</h2>
+      <button class="btn-copy" id="btn-copy" onclick="copyOutput()">Copy</button>
+    </div>
+    <div id="output-box" class="placeholder">Your humanized text will appear here...</div>
+    <div class="badge-row">
+      <span class="badge" id="badge-tone"></span>
+      <span class="badge" id="badge-intensity"></span>
+    </div>
+  </div>
+
+  <footer>Running locally · No data leaves your device</footer>
+
+  <script>
+    // Pill selection
+    document.querySelectorAll(".pill").forEach(pill => {
+      pill.addEventListener("click", () => {
+        const group = pill.dataset.group;
+        document.querySelectorAll(`.pill[data-group="${group}"]`).forEach(p => p.classList.remove("active"));
+        pill.classList.add("active");
+      });
+    });
+
+    function getSelected(group) {
+      return document.querySelector(`.pill.active[data-group="${group}"]`)?.dataset.value;
+    }
+
+    function showError(msg) {
+      const el = document.getElementById("error-msg");
+      el.textContent = msg;
+      el.style.display = "block";
+    }
+
+    function clearError() {
+      const el = document.getElementById("error-msg");
+      el.textContent = "";
+      el.style.display = "none";
+    }
+
+    function setLoading(loading) {
+      document.getElementById("btn-humanize").disabled = loading;
+      document.getElementById("btn-label").style.display = loading ? "none" : "inline";
+      document.getElementById("spinner").style.display = loading ? "block" : "none";
+    }
+
+    async function runHumanize() {
+      clearError();
+      const text = document.getElementById("input-text").value.trim();
+      const tone = getSelected("tone");
+      const intensity = getSelected("intensity");
+
+      if (!text) { showError("Please paste some text before humanizing."); return; }
+
+      setLoading(true);
+
+      try {
+        const res = await fetch("/humanize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text, tone, intensity }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showError(data.error || "Something went wrong.");
+          return;
+        }
+
+        const outputBox = document.getElementById("output-box");
+        outputBox.textContent = data.result;
+        outputBox.classList.remove("placeholder");
+
+        // Show badges
+        const badgeTone = document.getElementById("badge-tone");
+        const badgeIntensity = document.getElementById("badge-intensity");
+        badgeTone.textContent = `tone: ${data.tone}`;
+        badgeIntensity.textContent = `intensity: ${data.intensity}`;
+        badgeTone.style.display = "inline";
+        badgeIntensity.style.display = "inline";
+
+      } catch (err) {
+        showError("Could not reach the server. Is the Flask app running?");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function copyOutput() {
+      const text = document.getElementById("output-box").textContent;
+      if (!text || document.getElementById("output-box").classList.contains("placeholder")) return;
+
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById("btn-copy");
+        btn.textContent = "Copied!";
+        btn.classList.add("copied");
+        setTimeout(() => {
+          btn.textContent = "Copy";
+          btn.classList.remove("copied");
+        }, 2000);
+      });
+    }
+  </script>
+
+</body>
+</html>
