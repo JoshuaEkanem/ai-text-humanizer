@@ -1,27 +1,32 @@
 """
-cli.py - Command-line interface for ai-text-humanizer (Phase 1)
+cli.py - Command-line interface for ai-text-humanizer (Phase 2)
 
 Usage:
-    python cli.py                  # interactive mode (paste text, press Enter twice)
+    python cli.py                  # interactive mode
     python cli.py --model mistral  # use a different Ollama model
 """
 
 import argparse
 import sys
-from humanizer.core import humanize, check_ollama_connection, DEFAULT_MODEL
+from humanizer.core import (
+    humanize,
+    check_ollama_connection,
+    DEFAULT_MODEL,
+    TONES,
+    INTENSITIES,
+)
 
 
 BANNER = """
 ╔══════════════════════════════════════╗
-║       AI Text Humanizer v0.1         ║
-║       Phase 1 — CLI Engine           ║
+║       AI Text Humanizer v0.2         ║
+║       Phase 2 — Prompt Engineering   ║
 ╚══════════════════════════════════════╝
 """
 
 
-def get_multiline_input(prompt: str) -> str:
+def get_multiline_input() -> str:
     """Read multiple lines of input until the user enters a blank line."""
-    print(prompt)
     print("(Paste your text below. Press Enter twice when done)\n")
     lines = []
     while True:
@@ -33,6 +38,25 @@ def get_multiline_input(prompt: str) -> str:
             break
         lines.append(line)
     return "\n".join(lines).strip()
+
+
+def pick_option(label: str, options: list, default: str) -> str:
+    """
+    Display a numbered menu and return the user's choice.
+    Pressing Enter without a selection returns the default.
+    """
+    print(f"\n{label}")
+    for i, opt in enumerate(options, 1):
+        marker = " (default)" if opt == default else ""
+        print(f"  {i}. {opt}{marker}")
+
+    while True:
+        choice = input(f"Enter 1-{len(options)} or press Enter for default: ").strip()
+        if choice == "":
+            return default
+        if choice.isdigit() and 1 <= int(choice) <= len(options):
+            return options[int(choice) - 1]
+        print(f"  Please enter a number between 1 and {len(options)}.")
 
 
 def main():
@@ -62,7 +86,13 @@ def main():
     # Main loop
     while True:
         try:
-            text = get_multiline_input("--- INPUT ---")
+            # Step 1 — pick tone and intensity
+            tone = pick_option("Tone:", TONES, default="professional")
+            intensity = pick_option("Intensity:", INTENSITIES, default="moderate")
+
+            # Step 2 — get input text
+            print(f"\n--- INPUT  [tone: {tone} | intensity: {intensity}] ---")
+            text = get_multiline_input()
 
             if not text:
                 print("[Skipped — no text entered]\n")
@@ -70,9 +100,11 @@ def main():
 
             print("\nHumanizing... please wait.\n")
 
-            result = humanize(text, model=args.model)
+            # Step 3 — humanize
+            result = humanize(text, model=args.model, tone=tone, intensity=intensity)
 
-            print("--- OUTPUT ---")
+            # Step 4 — show output
+            print(f"--- OUTPUT [tone: {tone} | intensity: {intensity}] ---")
             print(result)
             print("-" * 40)
 
@@ -85,7 +117,7 @@ def main():
         except KeyboardInterrupt:
             print("\n\nInterrupted. Exiting.")
             break
-        except (ConnectionError, RuntimeError) as e:
+        except (ConnectionError, RuntimeError, ValueError) as e:
             print(f"\n[ERROR] {e}\n")
             break
 
