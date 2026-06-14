@@ -2,7 +2,7 @@
 
 A lightweight, fully offline tool that rewrites AI-generated text to sound more natural and human. Built on top of [Ollama](https://ollama.com) for local LLM inference — no internet connection or API keys required after setup.
 
-> **Status:** Phase 1 — CLI Engine ✅
+> **Status:** All phases complete ✅
 
 ---
 
@@ -14,23 +14,36 @@ A lightweight, fully offline tool that rewrites AI-generated text to sound more 
 | 2 | Prompt engineering (tone/intensity controls) | ✅ Done |
 | 3 | Flask web UI | ✅ Done |
 | 4 | UI polish + diff view | ✅ Done |
-| 5 | PyInstaller Windows executable | 🔜 Planned |
+| 5 | PyInstaller Windows executable | ✅ Done |
+
+---
+
+## Key Features
+
+- **Fully offline** — no API keys, no internet required after setup
+- **Tone control** — casual, professional, or academic output
+- **Intensity control** — light touch, balanced, or full rewrite
+- **Diff view** — side-by-side comparison of original vs humanized text
+- **Word & character counts** — live input and output counters
+- **Processing time** — shows how long each rewrite took
+- **CLI + Web UI** — use whichever suits your workflow
+- **Standalone .exe** — run on any Windows machine without Python
 
 ---
 
 ## Requirements
 
-- Python 3.9+
+- Python 3.9+ (for running from source)
 - [Ollama](https://ollama.com/download) installed and running
 - A pulled Ollama model (default: `llama3.2:3b`)
 
 ---
 
-## Setup
+## Setup (Run from Source)
 
 **1. Clone the repo**
 ```bash
-git clone https://github.com/YOUR_USERNAME/ai-text-humanizer.git
+git clone https://github.com/JoshuaEkanem/ai-text-humanizer.git
 cd ai-text-humanizer
 ```
 
@@ -59,25 +72,42 @@ ollama pull llama3.2:3b
 
 ## Usage
 
-**Run the CLI:**
+**Web UI (recommended):**
+```bash
+python app.py
+```
+Then open [http://localhost:5000](http://localhost:5000) in your browser.
+
+**CLI:**
 ```bash
 python cli.py
 ```
 
-**Use a different model:**
+**CLI with a different model:**
 ```bash
 python cli.py --model mistral:7b
 ```
 
-Paste your AI-generated text, press **Enter twice**, and the tool returns a humanized version.
+---
+
+## Build Windows Executable
+
+```bash
+pip install pyinstaller
+pyinstaller humanizer.spec
+```
+
+The `.exe` will be output to `dist/AI-Text-Humanizer.exe`. Double-click to run — it starts Flask in the background and opens your browser automatically.
+
+> **Note:** Ollama must be installed and running on the target machine.
 
 ---
 
 ## How It Works
 
-1. The CLI sends your text to a locally running Ollama instance via its REST API (`localhost:11434`).
-2. A carefully engineered prompt instructs the model to rewrite the text — using contractions, varying sentence rhythm, and removing robotic phrasing — without changing the original meaning.
-3. The result is printed directly in the terminal.
+1. Your text is sent to a locally running Ollama instance via its REST API (`localhost:11434`).
+2. A prompt engineered for tone and intensity instructs the model to rewrite the text — using contractions, varying sentence rhythm, and removing robotic phrasing — without changing the original meaning.
+3. The result is returned with a word-level diff highlighting what changed.
 
 All processing happens on your machine. No data leaves your device.
 
@@ -87,12 +117,17 @@ All processing happens on your machine. No data leaves your device.
 
 ```
 ai-text-humanizer/
+├── launcher.py         # PyInstaller entry point (auto-opens browser)
+├── app.py              # Flask app and API routes
 ├── cli.py              # CLI entry point
+├── humanizer.spec      # PyInstaller build config
 ├── requirements.txt
 ├── README.md
-└── humanizer/
-    ├── __init__.py
-    └── core.py         # humanize() function and Ollama API calls
+├── humanizer/
+│   ├── __init__.py
+│   └── core.py         # humanize() function and Ollama API calls
+└── templates/
+    └── index.html      # Web UI
 ```
 
 ---
