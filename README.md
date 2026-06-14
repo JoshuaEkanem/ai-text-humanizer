@@ -13,8 +13,8 @@ A lightweight, fully offline tool that rewrites AI-generated text to sound more 
 | 1 | Core engine + CLI | ✅ Done |
 | 2 | Prompt engineering (tone/intensity controls) | ✅ Done |
 | 3 | Flask web UI | ✅ Done |
-| 4 | UI polish + diff view | 🔜 Planned |
-| 5 | PyInstaller Windows executable | ⬜ Planned |
+| 4 | UI polish + diff view | ✅ Done |
+| 5 | PyInstaller Windows executable | 🔜 Planned |
 
 ---
 
